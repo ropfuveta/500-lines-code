@@ -1,0 +1,182 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#define MAX_ATTEMPTS 10
+#define MAX_NUMBER 100
+#define MIN_NUMBER 1
+
+
+// Function to display a welcome message
+void print_welcome_message() {
+    printf("Welcome to the C Program with 500 Lines of Code!\n");
+}
+
+
+// Function to generate a random number between 1 and MAX_NUMBER
+int get_random_number() {
+    return rand() % (MAX_NUMBER - MIN_NUMBER + 1) + MIN_NUMBER;
+}
+
+
+// Function to check if a number is prime
+int is_prime(int n) {
+    if (n < 2) {
+        return 0;  // Not prime
+    }
+    for (int i = 2; i * i <= n; i++) {
+        if (n % i == 0) {
+            return 0;  // Not prime
+        }
+    }
+    return 1;  // Prime
+}
+
+
+// Function to calculate the factorial of a number
+long long factorial(int n) {
+    if (n == 0 || n == 1) {
+        return 1;  // Factorial of 0 or 1 is 1
+    }
+    return n * factorial(n - 1);  // Recursively calculate factorial
+}
+
+
+// Function to play a number guessing game
+void play_game() {
+    int attempts = 0;
+    int guess;
+    int target_number = get_random_number();
+    printf("Let's play a guessing game! Guess a number between 1 and 100.\n");
+
+    
+// Give the player 10 attempts to guess the number
+    while (attempts < MAX_ATTEMPTS) {
+        printf("Attempt %d/%d: Your guess: ", attempts + 1, MAX_ATTEMPTS);
+        scanf("%d", &guess);
+
+        if (guess < target_number) {
+            printf("Too low!\n");
+        } else if (guess > target_number) {
+            printf("Too high!\n");
+        } else {
+            printf("Congratulations! You guessed the number in %d attempts.\n", attempts + 1);
+            break;
+        }
+        attempts++;
+    }
+
+    if (attempts == MAX_ATTEMPTS) {
+        printf("Sorry, you've used all %d attempts. The correct number was %d.\n", MAX_ATTEMPTS, target_number);
+    }
+}
+
+
+// Function to create some sample text files for file operations
+void create_sample_files() {
+    FILE *file;
+    char filename[20];
+    for (int i = 1; i <= 5; i++) {
+        sprintf(filename, "file_%d.txt", i);
+        file = fopen(filename, "w");
+        if (file == NULL) {
+            printf("Failed to create file %s\n", filename);
+            continue;
+        }
+        fprintf(file, "This is sample file %d.\n", i);
+        fclose(file);
+    }
+}
+
+
+// Function to read and print the contents of the created files
+void read_files() {
+    FILE *file;
+    char ch;
+    char filename[20];
+    for (int i = 1; i <= 5; i++) {
+        sprintf(filename, "file_%d.txt", i);
+        file = fopen(filename, "r");
+        if (file == NULL) {
+            printf("Failed to open file %s\n", filename);
+            continue;
+        }
+        printf("Contents of %s:\n", filename);
+        while ((ch = fgetc(file)) != EOF) {
+            putchar(ch);
+        }
+        fclose(file);
+    }
+}
+
+
+// Function to perform some basic calculations
+void perform_calculations() {
+    int num1, num2;
+    printf("Enter two numbers for basic arithmetic operations:\n");
+    printf("Enter number 1: ");
+    scanf("%d", &num1);
+    printf("Enter number 2: ");
+    scanf("%d", &num2);
+
+    printf("Addition: %d + %d = %d\n", num1, num2, num1 + num2);
+    printf("Subtraction: %d - %d = %d\n", num1, num2, num1 - num2);
+    printf("Multiplication: %d * %d = %d\n", num1, num2, num1 * num2);
+    printf("Division: %d / %d = %.2f\n", num1, num2, (float)num1 / num2);
+}
+
+
+// Function to sort an array using Bubble Sort
+void bubble_sort(int arr[], int n) {
+    int temp;
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
+
+
+// Function to print the contents of an array
+void print_array(int arr[], int n) {
+    for (int i = 0; i < n; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}
+
+
+// Main function that ties everything together
+int main() {
+    srand(time(NULL));  // Seed the random number generator
+
+    // Welcome message
+    print_welcome_message();
+
+    // Play the guessing game
+    play_game();
+
+    // Perform some calculations
+    perform_calculations();
+
+    // File operations: Create and read files
+    create_sample_files();
+    read_files();
+
+    // Sorting example
+    int arr[] = {12, 45, 23, 78, 56, 89, 34, 92, 67, 41};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    printf("Original array: ");
+    print_array(arr, n);
+    
+    bubble_sort(arr, n);
+    printf("Sorted array using Bubble Sort: ");
+    print_array(arr, n);
+
+    return 0;
+}
