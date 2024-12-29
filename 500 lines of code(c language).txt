@@ -1,0 +1,280 @@
+// Include Necessary Libraries
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+// Define the maximum number of students
+#define MAX_STUDENTS 100
+#define MAX_NAME_LENGTH 100
+#define FILENAME "students.dat"
+
+
+//Struct for Student Record
+
+typedef struct {
+    int id;  // Student ID
+    char name[MAX_NAME_LENGTH];  // Student Name
+    int age;  // Student Age
+    float grade;  // Student Grade
+} Student;
+
+
+//Declare Global Variables
+
+Student students[MAX_STUDENTS];
+int num_students = 0;
+
+
+//Function to Add a Student
+
+void addStudent() {
+    if (num_students >= MAX_STUDENTS) {
+        printf("Cannot add more students. Maximum limit reached.\n");
+        return;
+    }
+
+    Student newStudent;
+    printf("Enter Student ID: ");
+    scanf("%d", &newStudent.id);
+
+    printf("Enter Student Name: ");
+    getchar();  // To clear the buffer
+    fgets(newStudent.name, sizeof(newStudent.name), stdin);
+    newStudent.name[strcspn(newStudent.name, "\n")] = '\0';  // Remove newline character
+
+    printf("Enter Student Age: ");
+    scanf("%d", &newStudent.age);
+
+    printf("Enter Student Grade: ");
+    scanf("%f", &newStudent.grade);
+
+    // Add the new student to the array
+    students[num_students] = newStudent;
+    num_students++;
+
+    printf("Student added successfully!\n");
+}
+
+
+
+//Function to Display All Students
+
+void displayStudents() {
+    if (num_students == 0) {
+        printf("No students to display.\n");
+        return;
+    }
+
+    printf("Student Records:\n");
+    for (int i = 0; i < num_students; i++) {
+        printf("ID: %d\n", students[i].id);
+        printf("Name: %s\n", students[i].name);
+        printf("Age: %d\n", students[i].age);
+        printf("Grade: %.2f\n\n", students[i].grade);
+    }
+}
+
+
+//Function to Edit a Student's Record
+
+
+void editStudent() {
+    int id, found = 0;
+    printf("Enter Student ID to edit: ");
+    scanf("%d", &id);
+
+    for (int i = 0; i < num_students; i++) {
+        if (students[i].id == id) {
+            found = 1;
+            printf("Editing Student: %s\n", students[i].name);
+            printf("Enter new Name: ");
+            getchar();  // Clear the buffer
+            fgets(students[i].name, sizeof(students[i].name), stdin);
+            students[i].name[strcspn(students[i].name, "\n")] = '\0';  // Remove newline
+
+            printf("Enter new Age: ");
+            scanf("%d", &students[i].age);
+
+            printf("Enter new Grade: ");
+            scanf("%f", &students[i].grade);
+
+            printf("Student updated successfully!\n");
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Student with ID %d not found.\n", id);
+    }
+}
+
+
+//Function to Delete a Student's Record
+
+void deleteStudent() {
+    int id, found = 0;
+    printf("Enter Student ID to delete: ");
+    scanf("%d", &id);
+
+    for (int i = 0; i < num_students; i++) {
+        if (students[i].id == id) {
+            found = 1;
+            // Shift all subsequent students one position left
+            for (int j = i; j < num_students - 1; j++) {
+                students[j] = students[j + 1];
+            }
+            num_students--;  // Decrease the student count
+            printf("Student with ID %d deleted successfully!\n", id);
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Student with ID %d not found.\n", id);
+    }
+}
+
+
+
+//Function to Sort Students by Grade
+
+
+void sortStudentsByGrade() {
+    for (int i = 0; i < num_students - 1; i++) {
+        for (int j = i + 1; j < num_students; j++) {
+            if (students[i].grade < students[j].grade) {
+                // Swap students[i] and students[j]
+                Student temp = students[i];
+                students[i] = students[j];
+                students[j] = temp;
+            }
+        }
+    }
+    printf("Students sorted by grade.\n");
+}
+
+
+
+//Function to Save Students to a File
+
+
+void saveStudentsToFile() {
+    FILE *file = fopen(FILENAME, "wb");
+    if (file == NULL) {
+        printf("Error opening file for saving.\n");
+        return;
+    }
+
+    fwrite(&num_students, sizeof(int), 1, file);
+    fwrite(students, sizeof(Student), num_students, file);
+
+    fclose(file);
+    printf("Students saved to file successfully.\n");
+}
+
+
+//Function to Load Students from a File
+
+
+void loadStudentsFromFile() {
+    FILE *file = fopen(FILENAME, "rb");
+    if (file == NULL) {
+        printf("No saved data found. Starting fresh.\n");
+        return;
+    }
+
+    fread(&num_students, sizeof(int), 1, file);
+    fread(students, sizeof(Student), num_students, file);
+
+    fclose(file);
+    printf("Students loaded from file successfully.\n");
+}
+
+
+
+//Menu Function
+
+
+void displayMenu() {
+    printf("\nStudent Record System\n");
+    printf("1. Add Student\n");
+    printf("2. Display All Students\n");
+    printf("3. Edit Student\n");
+    printf("4. Delete Student\n");
+    printf("5. Sort Students by Grade\n");
+    printf("6. Save Students to File\n");
+    printf("7. Load Students from File\n");
+    printf("8. Exit\n");
+}
+
+
+
+//Input Validation Functions
+
+
+
+// Function to check if an integer is a valid ID
+int isValidID(int id) {
+    return id > 0; // Simple check: ID must be positive
+}
+
+// Function to check if age is within a reasonable range
+int isValidAge(int age) {
+    return (age >= 18 && age <= 100); // Assume ages between 18 and 100 are valid
+}
+
+// Function to check if grade is within the valid range
+int isValidGrade(float grade) {
+    return (grade >= 0.0f && grade <= 100.0f); // Grade must be between 0 and 100
+}
+
+
+
+//Main Function
+
+
+
+int main() {
+    int choice;
+    loadStudentsFromFile();  // Load students from file when the program starts
+
+    while (1) {
+        displayMenu();  // Show the menu
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addStudent();  // Add a student
+                break;
+            case 2:
+                displayStudents();  // Display all students
+                break;
+            case 3:
+                editStudent();  // Edit a student
+                break;
+            case 4:
+                deleteStudent();  // Delete a student
+                break;
+            case 5:
+                sortStudentsByGrade();  // Sort students by grade
+                break;
+            case 6:
+                saveStudentsToFile();  // Save students to a file
+                break;
+            case 7:
+                loadStudentsFromFile();  // Load students from a file
+                break;
+            case 8:
+                saveStudentsToFile();  // Ensure data is saved before exiting
+                printf("Exiting the system...\n");
+                return 0;  // Exit the program
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
